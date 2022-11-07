@@ -1,4 +1,5 @@
 import './index.scss';
+import React from 'react';
 
 const questions = [
   {
@@ -49,6 +50,8 @@ function Game() {
 }
 
 function App() {
+  const [number, setNumber] = React.useState(0);
+
   return (
     <div className="App">
       <Game />
