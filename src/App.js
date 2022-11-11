@@ -1,5 +1,6 @@
 import React from 'react';
-import axios from 'axios'
+import axios from 'axios';
+import Pagination from './pagination';
 import './index.scss';
 
 function Collection({ name, images }) {
@@ -17,35 +18,41 @@ function Collection({ name, images }) {
 }
 
 function App() {
+  const categories = [
+    'Все',
+    'Море',
+    'Горы',
+    'Архитектура',
+    'Города'
+  ]
   const collectionsRef = React.useRef([])
+  const [page, setPage] = React.useState(1)
+  const [categoryIndex, setCategoryIndex] = React.useState(0)
+  const [photos, setPhotos] = React.useState([])
+  // const [categoryId, setCategoryId] = React.useState(0)
+  const [name, setName] = React.useState('')
   React.useEffect(() => {
-    axios.get(`https://636d09b8ab4814f2b276a7b1.mockapi.io/collections?${categoryId > 0 ? `category=${categoryId}` : ''}`)
+    axios.get(`https://636d09b8ab4814f2b276a7b1.mockapi.io/collections?page=1&${categoryIndex > 0 ? `category=${categoryIndex}` : ''}`)
     .then(response => {
       collectionsRef.current = response.data;
-      // setCollections(response.data)
+      console.log(collectionsRef.current)
+      setName(collectionsRef.current[0].name)
+      setPhotos(collectionsRef.current[0].photos)
     })
     // fetch('https://636d09b8ab4814f2b276a7b1.mockapi.io/collections')
     // .then((res) => res.json())
     // .then((json) => {
     //   setCollections(json)
     // })
-  }, [])
-
-  // const [collections, setCollections] = React.useState([])
-  const categories = [
-    'Все',
-    'Горы',
-    'Море',
-    'Архитектура',
-    'Города'
-  ]
-  const [categoryId, setCategoryId] = React.useState(0)
+  }, [categoryIndex])
 
   const onClickCategory = (index) => {
-    setCategoryId(index)
+    setCategoryIndex(index)
   }
 
-  console.log(collectionsRef.current[categoryId].name)
+  const onChangePage = (number) => {
+    setPage(number)
+  }
 
   return (
     <div className="App">
@@ -55,7 +62,7 @@ function App() {
           {
             categories.map((categoryName, index) => (
               <li onClick={() => onClickCategory(index)} key={index} 
-              className={categoryId === index ? 'active' : ''}>{categoryName}</li>
+              className={categoryIndex === index ? 'active' : ''}>{categoryName}</li>
             ))
           }
         </ul>
@@ -63,8 +70,8 @@ function App() {
       </div>
       <div className="content">
         <Collection
-          name='NAME'
-          images={[
+          name={name ? name : 'Путетешствие по миру'}
+          images={photos.length > 0 ? photos : [
             'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
             'https://images.unsplash.com/photo-1560840067-ddcaeb7831d2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDB8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
             'https://images.unsplash.com/photo-1531219572328-a0171b4448a3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mzl8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
@@ -72,11 +79,7 @@ function App() {
           ]}
         />
       </div>
-      <ul className="pagination">
-        <li>1</li>
-        <li className="active">2</li>
-        <li>3</li>
-      </ul>
+      <Pagination onChangePage={number => onChangePage(number)}/>
     </div>
   );
 }
