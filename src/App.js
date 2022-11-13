@@ -26,28 +26,31 @@ function App() {
     'Города'
   ]
   const collectionsRef = React.useRef([])
-  const [page, setPage] = React.useState(1)
+  const [page, setPage] = React.useState(0)
+  const [pageCount, setPageCount] = React.useState(0)
   const [categoryIndex, setCategoryIndex] = React.useState(0)
   const [photos, setPhotos] = React.useState([])
+  const [searchValue, setSearchValue] = React.useState('')
   // const [categoryId, setCategoryId] = React.useState(0)
   const [name, setName] = React.useState('')
   React.useEffect(() => {
-    axios.get(`https://636d09b8ab4814f2b276a7b1.mockapi.io/collections?page=1&${categoryIndex > 0 ? `category=${categoryIndex}` : ''}`)
+    axios.get(`https://636d09b8ab4814f2b276a7b1.mockapi.io/collections?${categoryIndex > 0 ? `category=${categoryIndex}` : ''}&search=${searchValue}`)
     .then(response => {
       collectionsRef.current = response.data;
-      console.log(collectionsRef.current)
-      setName(collectionsRef.current[0].name)
-      setPhotos(collectionsRef.current[0].photos)
+      setName(collectionsRef.current[page].name)
+      setPhotos(collectionsRef.current[page].photos)
+      setPageCount(collectionsRef.current.length)
     })
     // fetch('https://636d09b8ab4814f2b276a7b1.mockapi.io/collections')
     // .then((res) => res.json())
     // .then((json) => {
     //   setCollections(json)
     // })
-  }, [categoryIndex])
+  }, [categoryIndex, page, pageCount, searchValue])
 
   const onClickCategory = (index) => {
     setCategoryIndex(index)
+    setPage(0)
   }
 
   const onChangePage = (number) => {
@@ -66,7 +69,7 @@ function App() {
             ))
           }
         </ul>
-        <input className="search-input" placeholder="Поиск по названию" />
+        <input value={searchValue} onChange={(event) => setSearchValue(event.target.value)} className="search-input" placeholder="Поиск по названию" />
       </div>
       <div className="content">
         <Collection
@@ -79,7 +82,7 @@ function App() {
           ]}
         />
       </div>
-      <Pagination onChangePage={number => onChangePage(number)}/>
+      <Pagination pageCount={pageCount} onChangePage={number => onChangePage(number)}/>
     </div>
   );
 }
