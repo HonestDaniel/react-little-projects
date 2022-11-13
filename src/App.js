@@ -34,7 +34,8 @@ function App() {
   // const [categoryId, setCategoryId] = React.useState(0)
   const [name, setName] = React.useState('')
   React.useEffect(() => {
-    axios.get(`https://636d09b8ab4814f2b276a7b1.mockapi.io/collections?${categoryIndex > 0 ? `category=${categoryIndex}` : ''}&search=${searchValue}`)
+    //&search=${searchValue}
+    axios.get(`https://636d09b8ab4814f2b276a7b1.mockapi.io/collections?${categoryIndex > 0 ? `category=${categoryIndex}` : ''}`)
     .then(response => {
       collectionsRef.current = response.data;
       setName(collectionsRef.current[page].name)
@@ -72,15 +73,25 @@ function App() {
         <input value={searchValue} onChange={(event) => setSearchValue(event.target.value)} className="search-input" placeholder="Поиск по названию" />
       </div>
       <div className="content">
-        <Collection
-          name={name ? name : 'Путетешствие по миру'}
-          images={photos.length > 0 ? photos : [
-            'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
-            'https://images.unsplash.com/photo-1560840067-ddcaeb7831d2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDB8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
-            'https://images.unsplash.com/photo-1531219572328-a0171b4448a3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mzl8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
-            'https://images.unsplash.com/photo-1573108724029-4c46571d6490?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzR8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
-          ]}
-        />
+        {
+          collectionsRef.current
+          .filter((obj) => {
+            if (obj.name === searchValue) 
+            return true
+          })
+          .map((obj, index) => (
+            <Collection
+            key={index}
+            name={name ? obj.name : 'Путетешствие по миру'}
+            images={photos.length > 0 ? obj.photos : [
+              'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+              'https://images.unsplash.com/photo-1560840067-ddcaeb7831d2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDB8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+              'https://images.unsplash.com/photo-1531219572328-a0171b4448a3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mzl8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+              'https://images.unsplash.com/photo-1573108724029-4c46571d6490?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzR8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+            ]}
+          />
+          ))
+        }
       </div>
       <Pagination pageCount={pageCount} onChangePage={number => onChangePage(number)}/>
     </div>
